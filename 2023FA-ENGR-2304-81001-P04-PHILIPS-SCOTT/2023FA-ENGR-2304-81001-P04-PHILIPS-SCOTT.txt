@@ -1,0 +1,95 @@
+﻿//2023FA-ENGR-2304-81001-PHILIPS-SCOTT-P04
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+int main() {
+int Vs, R1, R2, R3;
+double I1, I2, I3, V1, V2, V3;
+double epsilon = 1e-3;
+while (1) {
+// Step 1: Generate random values
+Vs = rand() % 9 + 1;
+R1 = rand() % 20 + 1;
+R2 = rand() % 20 + 1;
+R3 = rand() % 20 + 1;
+// Step 2: Calculate currents and voltages using KVL and KCL
+I1 = Vs / (double)(R1 + R2 + R3);
+V1 = I1 * R1;
+I2 = I1;
+V2 = I2 * R2;
+I3 = I1;
+V3 = I3 * R3;
+// Step 3: Display values and ask for user input
+printf("Circuit values:\n");
+printf("Vs: %d\n", Vs);
+printf("R1: %d\n", R1);
+printf("R2: %d\n", R2);
+printf("R3: %d\n", R3);
+// Input validation for currents
+double userI1, userI2, userI3, userV1, userV2, userV3;
+char buffer[256];
+printf("Enter I1: ");
+if (fgets(buffer, sizeof(buffer), stdin) != NULL && sscanf(buffer, "%lf", &userI1) == 1) {
+// Input is a valid double
+} else {
+printf("Invalid input for I1. Please enter a valid number.\n");
+continue;
+}
+printf("Enter I2: ");
+if (fgets(buffer, sizeof(buffer), stdin) != NULL && sscanf(buffer, "%lf", &userI2) == 1) {
+// Input is a valid double
+} else {
+printf("Invalid input for I2. Please enter a valid number.\n");
+continue;
+}
+printf("Enter I3: ");
+if (fgets(buffer, sizeof(buffer), stdin) != NULL && sscanf(buffer, "%lf", &userI3) == 1) {
+// Input is a valid double
+} else {
+printf("Invalid input for I3. Please enter a valid number.\n");
+continue;
+}
+printf("Enter V1: ");
+if (fgets(buffer, sizeof(buffer), stdin) != NULL && sscanf(buffer, "%lf", &userV1) == 1) {
+// Input is a valid double
+} else {
+printf("Invalid input for V1. Please enter a valid number.\n");
+continue;
+}
+printf("Enter V2: ");
+if (fgets(buffer, sizeof(buffer), stdin) != NULL && sscanf(buffer, "%lf", &userV2) == 1) {
+// Input is a valid double
+} else {
+printf("Invalid input for V2. Please enter a valid number.\n");
+continue;
+}
+printf("Enter V3: ");
+if (fgets(buffer, sizeof(buffer), stdin) != NULL && sscanf(buffer, "%lf", &userV3) == 1) {
+// Input is a valid double
+} else {
+printf("Invalid input for V3. Please enter a valid number.\n");
+continue;
+}
+// Step 4: Compare user input with calculated values
+if (fabs(userI1 - I1) < epsilon && fabs(userI2 - I2) < epsilon && fabs(userI3 - I3) < epsilon &&
+fabs(userV1 - V1) < epsilon && fabs(userV2 - V2) < epsilon && fabs(userV3 - V3) < epsilon) {
+printf("Success! Your values match the calculated values.\n");
+} else {
+printf("Failure! Your values do not match the calculated values.\n");
+printf("Correct Answer: I1=%.3lf I2=%.3lf I3=%.3lf V1=%.3lf V2=%.3lf V3=%.3lf\n", I1, I2, I3, V1, V2, V3);
+}
+// Step 5: Ask user if they want to continue or exit
+printf("Enter 'exit' to quit, or any other key to generate new values: ");
+char choice[256]; // Increased the size of the array to handle longer inputs
+if (fgets(choice, sizeof(choice), stdin) != NULL) {
+choice[strcspn(choice, "\n")] = '\0'; // Remove newline character if present
+if (strcmp(choice, "exit") == 0) {
+break;
+}
+} else {
+printf("Invalid input. Generating new values.\n");
+}
+}
+return 0;
+}

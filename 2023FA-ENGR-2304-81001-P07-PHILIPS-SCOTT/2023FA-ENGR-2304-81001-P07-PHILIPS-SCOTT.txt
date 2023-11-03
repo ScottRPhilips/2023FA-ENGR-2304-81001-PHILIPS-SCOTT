@@ -1,0 +1,129 @@
+﻿//2023FA-ENGR-2304-81001-PHILIPS-SCOTT-P07
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <ctype.h> // Include the ctype.h header for toupper() function
+char board[3][3];
+void initializeBoard() {
+for (int i = 0; i < 3; ++i) {
+for (int j = 0; j < 3; ++j) {
+board[i][j] = ' ';
+}
+}
+}
+void printBoard() {
+printf("-------------\n");
+for (int i = 0; i < 3; ++i) {
+printf("| %c | %c | %c |\n", board[i][0], board[i][1], board[i][2]);
+printf("-------------\n");
+}
+}
+int checkWin() {
+// Check rows, columns, and diagonals
+for (int i = 0; i < 3; ++i) {
+if (board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != ' ') {
+return 1;
+}
+if (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != ' ') {
+return 1;
+}
+}
+if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != ' ') {
+return 1;
+}
+if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != ' ') {
+return 1;
+}
+return 0;
+}
+int isBoardFull() {
+for (int i = 0; i < 3; ++i) {
+for (int j = 0; j < 3; ++j) {
+if (board[i][j] == ' ') {
+return 0; // Board is not full
+}
+}
+}
+return 1; // Board is full
+}
+int main() {
+int numPlayers;
+char currentPlayer;
+int row, col;
+char choice;
+srand(time(NULL));
+int replayChoice = 1;
+printf("Welcome to Tic-Tac-Toe!\n");
+while (replayChoice == 1) {
+printf("Enter the number of players (1 or 2): ");
+int inputCheck = scanf("%d", &numPlayers);
+while (inputCheck != 1 || (numPlayers != 1 && numPlayers != 2)) {
+// Clear input buffer
+while (getchar() != '\n');
+printf("Invalid choice. Please enter 1 for one player or 2 for two players: ");
+inputCheck = scanf("%d", &numPlayers);
+}
+printf("Do you want to be 'X' or 'O'? Enter 'X' or 'O': ");
+inputCheck = scanf(" %c", &choice);
+// Validate the choice of symbol
+while (inputCheck != 1 || (toupper(choice) != 'X' && toupper(choice) != 'O')) {
+// Clear input buffer
+while (getchar() != '\n');
+printf("Invalid choice. Please enter 'X' or 'O': ");
+inputCheck = scanf(" %c", &choice);
+}
+choice = toupper(choice); // Convert the choice to uppercase
+// Randomly determine who goes first
+int randomNum = rand() % 2;
+if (randomNum == 1) {
+currentPlayer = (choice == 'X') ? 'O' : 'X';
+printf("Player %c goes first!\n", currentPlayer);
+} else {
+currentPlayer = choice;
+printf("Player %c goes first!\n", currentPlayer);
+}
+initializeBoard();
+printBoard();
+while (1) {
+printf("Player %c's turn.\n", currentPlayer);
+if (numPlayers == 1 && currentPlayer == 'O') {
+// Computer's turn (random move)
+do {
+row = rand() % 3;
+col = rand() % 3;
+} while (board[row][col] != ' ');
+} else {
+// Player's turn
+do {
+printf("Enter row (0, 1, or 2) and column (0, 1, or 2) separated by space: ");
+inputCheck = scanf("%d %d", &row, &col);
+// Clear input buffer in case of invalid input
+while (getchar() != '\n');
+} while (inputCheck != 2 || row < 0 || row > 2 || col < 0 || col > 2 || board[row][col] != ' ');
+}
+board[row][col] = currentPlayer;
+printBoard();
+if (checkWin()) {
+printf("Player %c wins! Congratulations!\n", currentPlayer);
+break;
+} else if (isBoardFull()) {
+printf("It's a draw! Good game!\n");
+break;
+}
+// Switch player
+currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+}
+// Ask user if they want to play again
+printf("Do you want to play again? (1 for Yes, 2 for No): ");
+inputCheck = scanf("%d", &replayChoice);
+// Validate user input
+while (inputCheck != 1 || (replayChoice != 1 && replayChoice != 2)) {
+// Clear input buffer
+while (getchar() != '\n');
+printf("Invalid choice. Please enter 1 to play again or 2 to quit: ");
+inputCheck = scanf("%d", &replayChoice);
+}
+}
+printf("Thank you for playing Tic-Tac-Toe! Goodbye!\n");
+return 0;
+}

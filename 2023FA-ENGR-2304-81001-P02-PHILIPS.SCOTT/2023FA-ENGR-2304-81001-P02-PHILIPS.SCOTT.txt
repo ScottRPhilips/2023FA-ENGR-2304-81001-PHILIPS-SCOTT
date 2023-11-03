@@ -1,0 +1,180 @@
+﻿//2023FA-ENGR-2304-81001-PHILIPS-SCOTT-P02
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
+bool isValidBinary(const char binary[8]) {
+for (int i = 0; i < 8; i++) {
+if (binary[i] != '0' && binary[i] != '1') {
+return false;
+}
+}
+return true;
+}
+int binaryToDecimal(const char binary[9]) {
+if (strlen(binary) != 8 || !isValidBinary(binary)) {
+return -1;
+}
+bool isNegative = (binary[0] == '1');
+int decimal = 0;
+for (int i = 1; i < 8; i++) {
+decimal = decimal * 2 + (binary[i] - '0');
+}
+if (isNegative) {
+decimal = -(128 - decimal);
+}
+if (decimal > 127) {
+decimal = -(256 - decimal);
+}
+return decimal;
+}
+void decimalToBinary() {
+int decimal;
+printf("Enter a decimal number (-127 to 127): ");
+if (scanf("%d", &decimal) != 1) {
+printf("Invalid input. Please enter a valid number.\n");
+while (getchar() != '\n');
+return;
+}
+while (getchar() != '\n');
+if (decimal >= -127 && decimal <= 127) {
+char binary[9];
+int temp = abs(decimal);
+for (int i = 7; i >= 0; i--) {
+binary[i] = (temp & 1) + '0';
+temp >>= 1;
+}
+binary[8] = '\0';
+if (decimal < 0) {
+for (int i = 0; i < 8; i++) {
+if (binary[i] == '0') {
+binary[i] = '1';
+} else {
+binary[i] = '0';
+}
+}
+binary[0] = '1';
+}
+printf("Binary representation: %s\n", binary);
+} else {
+printf("Invalid input. Please enter a number in the range -127 to 127.\n");
+}
+}
+#define MAX_BITS 64
+void binaryToHex(char *binary, char *hex) {
+unsigned long long int decimal = strtoull(binary, NULL, 2);
+sprintf(hex, "0x%llX", decimal);
+}
+void hexToBinary(char *hex, char *binary) {
+int i = 0;
+for (i = 0; hex[i] != '\0'; ++i) {
+int val;
+if (hex[i] >= '0' && hex[i] <= '9') {
+val = hex[i] - '0';
+} else if (hex[i] >= 'A' && hex[i] <= 'F') {
+val = hex[i] - 'A' + 10;
+} else if (hex[i] >= 'a' && hex[i] <= 'f') {
+val = hex[i] - 'a' + 10;
+} else {
+printf("Invalid hexadecimal input.\n");
+return;
+}
+for (int j = 3; j >= 0; --j) {
+binary[i * 4 + j] = (val % 2) + '0';
+val /= 2;
+}
+}
+binary[i * 4] = '\0';
+}
+int main() {
+int choice;
+int submenuChoice;
+char input[MAX_BITS + 3];
+char result[MAX_BITS * 4 + 1];
+char userChoice;
+while (1) {
+printf("Main Menu:\n");
+printf("1. Decimal to Binary and Binary to Decimal\n");
+printf("2. Binary to Hexadecimal and Hexadecimal to Binary\n");
+printf("3. Quit\n");
+printf("Enter your choice: ");
+if (scanf("%d", &choice) != 1) {
+printf("Invalid input. Please enter a number.\n");
+while (getchar() != '\n');
+continue;
+}
+while (getchar() != '\n');
+switch (choice) {
+case 1:
+while (1) {
+printf("Decimal to Binary and Binary to Decimal Menu:\n");
+printf("1. Decimal to Binary\n");
+printf("2. Binary to Decimal\n");
+printf("3. Back to Main Menu\n");
+printf("Enter your choice: ");
+if (scanf("%d", &submenuChoice) != 1) {
+printf("Invalid input. Please enter a number.\n");
+while (getchar() != '\n');
+continue;
+}
+while (getchar() != '\n');
+switch (submenuChoice) {
+case 1:
+decimalToBinary();
+break;
+case 2: {
+char binary[9];
+printf("Enter an 8-bit binary number: ");
+scanf("%8s", binary);
+int decimal = binaryToDecimal(binary);
+if (decimal != -1) {
+printf("Decimal representation: %d\n", decimal);
+} else {
+printf("Invalid input. Please enter a valid 8-bit binary number.\n");
+}
+break;
+}
+case 3:
+printf("Returning to the Main Menu.\n");
+break;
+default:
+printf("Invalid choice. Please select a valid option (1, 2, or 3).\n");
+}
+if (submenuChoice == 3) {
+break;
+}
+}
+break;
+case 2:
+do {
+printf("Enter a number (hexadecimal numbers should start with 0x): ");
+scanf("%s", input);
+if (strncmp(input, "0x", 2) == 0) {
+if (strlen(input) <= 18) {
+hexToBinary(input + 2, result);
+printf("Binary: %s\n", result);
+} else {
+printf("Invalid input for hexadecimal conversion.\n");
+}
+} else {
+if (strlen(input) <= MAX_BITS) {
+binaryToHex(input, result);
+printf("Hexadecimal: %s\n", result);
+} else {
+printf("Invalid input for binary conversion.\n");
+}
+}
+printf("Do you want to calculate another number? (y/n): ");
+scanf(" %c", &userChoice);
+} while (userChoice == 'y' || userChoice == 'Y');
+break;
+case 3:
+printf("Exiting the program. Goodbye!\n");
+exit(EXIT_SUCCESS);
+default:
+printf("Invalid choice. Please select a valid option (1, 2, or 3).\n");
+}
+}
+return 0;
+}

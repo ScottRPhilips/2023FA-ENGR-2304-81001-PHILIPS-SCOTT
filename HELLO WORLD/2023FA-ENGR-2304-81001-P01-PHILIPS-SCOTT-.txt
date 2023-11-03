@@ -1,0 +1,8 @@
+//2023FA-ENGR-2304-81001-PHILIPS-SCOTT-P01
+#include <stdio.h>
+int main(void){
+        
+        printf("Hello World!");
+        
+        return 0;
+}

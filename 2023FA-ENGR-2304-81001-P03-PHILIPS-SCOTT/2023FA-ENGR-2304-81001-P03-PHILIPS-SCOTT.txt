@@ -1,0 +1,96 @@
+﻿//2023FA-ENGR-2304-81001-PHILIPS-SCOTT-P03
+#include <stdio.h>
+int main() {
+int choice;
+do {
+printf("Choose an option:\n");
+printf("1. Solve 2x2 system of equations\n");
+printf("2. Solve 3x3 system of equations\n");
+printf("3. Exit\n");
+printf("Enter your choice: ");
+scanf("%d", &choice);
+switch (choice) {
+case 1: {
+float a1, b1, c1, a2, b2, c2, x, y;
+// Get coefficients for the first equation
+printf("Enter coefficients for the first equation (a1*x + b1*y = c1):\n");
+printf("Enter a1: ");
+scanf("%f", &a1);
+printf("Enter b1: ");
+scanf("%f", &b1);
+printf("Enter c1: ");
+scanf("%f", &c1);
+// Get coefficients for the second equation
+printf("Enter coefficients for the second equation (a2*x + b2*y = c2):\n");
+printf("Enter a2: ");
+scanf("%f", &a2);
+printf("Enter b2: ");
+scanf("%f", &b2);
+printf("Enter c2: ");
+scanf("%f", &c2);
+// Solve the system of equations
+float determinant = a1 * b2 - a2 * b1;
+if (determinant == 0) {
+printf("The system of equations has no unique solution.\n");
+} else {
+x = (c1 * b2 - c2 * b1) / determinant;
+y = (a1 * c2 - a2 * c1) / determinant;
+printf("Solution: x = %.2f, y = %.2f\n", x, y);
+}
+break;
+}
+case 2: {
+printf("3x3 system for ax+by+cz=d\n");
+double a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3;
+// Asking the user to enter coefficients and constants
+printf("Enter coefficient 'a1': ");
+scanf("%lf", &a1);
+printf("Enter coefficient 'b1': ");
+scanf("%lf", &b1);
+printf("Enter coefficient 'c1': ");
+scanf("%lf", &c1);
+printf("Enter constant 'd1': ");
+scanf("%lf", &d1);
+printf("Enter coefficient 'a2': ");
+scanf("%lf", &a2);
+printf("Enter coefficient 'b2': ");
+scanf("%lf", &b2);
+printf("Enter coefficient 'c2': ");
+scanf("%lf", &c2);
+printf("Enter constant 'd2': ");
+scanf("%lf", &d2);
+printf("Enter coefficient 'a3': ");
+scanf("%lf", &a3);
+printf("Enter coefficient 'b3': ");
+scanf("%lf", &b3);
+printf("Enter coefficient 'c3': ");
+scanf("%lf", &c3);
+printf("Enter constant 'd3': ");
+scanf("%lf", &d3);
+// Solving the system of equations
+double determinant = a1 * (b2 * c3 - b3 * c2) - b1 * (a2 * c3 - a3 * c2) + c1 * (a2 * b3 - a3 * b2);
+double determinantX = d1 * (b2 * c3 - b3 * c2) - b1 * (d2 * c3 - d3 * c2) + c1 * (d2 * b3 - d3 * b2);
+double determinantY = a1 * (d2 * c3 - d3 * c2) - d1 * (a2 * c3 - a3 * c2) + c1 * (a2 * d3 - a3 * d2);
+double determinantZ = a1 * (b2 * d3 - b3 * d2) - b1 * (a2 * d3 - a3 * d2) + d1 * (a2 * b3 - a3 * b2);
+// Checking if the system has a unique solution
+if (determinant != 0) {
+// Calculating the values of x, y, and z
+double x = determinantX / determinant;
+double y = determinantY / determinant;
+double z = determinantZ / determinant;
+// Printing the solutions
+printf("Solution: x = %.2lf, y = %.2lf, z = %.2lf\n", x, y, z);
+} else {
+printf("The system of equations does not have a unique solution.\n");
+}
+break;
+}
+case 3:
+printf("Exiting the program.\n");
+break;
+default:
+printf("Invalid choice. Please enter a valid option.\n");
+}
+} while (choice != 3);
+return 0;
+}
