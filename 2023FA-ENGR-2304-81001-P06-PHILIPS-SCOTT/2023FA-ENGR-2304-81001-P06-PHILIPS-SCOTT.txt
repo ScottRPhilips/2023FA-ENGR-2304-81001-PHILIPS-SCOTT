@@ -1,0 +1,234 @@
+﻿//2023FA-ENGR-2304-81001-PHILIPS-SCOTT-P06
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <math.h>
+struct Date {
+int year;
+int month;
+int day;
+};
+struct ProductionData {
+struct Date date;
+int plants[6];
+};
+struct ProductionData dataset[1200];
+int dataSize = 0;
+void readCSVFile() {
+char filename[256];
+FILE* file;
+while (1) {
+printf("Enter the CSV file name: ");
+scanf("%s", filename);
+file = fopen(filename, "r");
+if (file != NULL) {
+break;
+} else {
+printf("Error opening the file. Please enter a valid file name.\n");
+}
+}
+char line[256];
+fgets(line, sizeof(line), file);
+while (fscanf(file, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
+&dataset[dataSize].date.year, &dataset[dataSize].date.month, &dataset[dataSize].date.day,
+&dataset[dataSize].plants[0], &dataset[dataSize].plants[1], &dataset[dataSize].plants[2],
+&dataset[dataSize].plants[3], &dataset[dataSize].plants[4], &dataset[dataSize].plants[5]) == 9) {
+dataSize++;
+}
+fclose(file);
+}
+void calculateStatistics(double* mean, int* max, int* min, int* mode, double* variance, double* stdDev) {
+int sum = 0;
+int maxCount = 0;
+int counts[101] = {0};
+*max = *min = dataset[0].plants[0];
+for (int i = 0; i < dataSize; ++i) {
+for (int j = 0; j < 6; ++j) {
+int production = dataset[i].plants[j];
+sum += production;
+if (production > *max) {
+*max = production;
+}
+if (production < *min) {
+*min = production;
+}
+counts[production]++;
+if (counts[production] > maxCount) {
+maxCount = counts[production];
+*mode = production;
+}
+}
+}
+*mean = (double)sum / (dataSize * 6);
+double squaredDifferences = 0;
+for (int i = 0; i < dataSize; ++i) {
+for (int j = 0; j < 6; ++j) {
+squaredDifferences += pow(dataset[i].plants[j] - *mean, 2);
+}
+}
+*variance = squaredDifferences / (dataSize * 6);
+*stdDev = sqrt(*variance);
+}
+void generateDetailedReport() {
+double mean, variance, stdDev;
+int max, min, mode;
+calculateStatistics(&mean, &max, &min, &mode, &variance, &stdDev);
+printf("Mean Production: %.2lf\n", mean);
+printf("Maximum Production: %d\n", max);
+printf("Minimum Production: %d\n", min);
+printf("Mode Production: %d\n", mode);
+printf("Variance: %.2lf\n", variance);
+printf("Standard Deviation: %.2lf\n", stdDev);
+}
+void searchSinglePlantProduction(int year, int month, int day, int plantIndex) {
+int found = 0;
+for (int i = 0; i < dataSize; ++i) {
+if (dataset[i].date.year == year && dataset[i].date.month == month && dataset[i].date.day == day) {
+printf("Production for Plant L%d on %d-%02d-%02d: %d\n", plantIndex + 1, year, month, day, dataset[i].plants[plantIndex]);
+found = 1;
+break;
+}
+}
+if (!found) {
+printf("No production data found for Plant L%d on %d-%02d-%02d\n", plantIndex + 1, year, month, day);
+}
+}
+void searchAllPlantsProduction(int year, int month, int day) {
+printf("Production for all plants on %d-%02d-%02d:\n", year, month, day);
+for (int i = 0; i < dataSize; ++i) {
+if (dataset[i].date.year == year && dataset[i].date.month == month && dataset[i].date.day == day) {
+for (int j = 0; j < 6; ++j) {
+printf("Plant L%d: %d\n", j + 1, dataset[i].plants[j]);
+}
+}
+}
+}
+void generateProductionReport() {
+int bestPlant = 0;
+for (int i = 1; i < 6; ++i) {
+if (dataset[i].plants[i] > dataset[bestPlant].plants[bestPlant]) {
+bestPlant = i;
+}
+}
+int worstPlant = 0;
+for (int i = 1; i < 6; ++i) {
+if (dataset[i].plants[i] < dataset[worstPlant].plants[worstPlant]) {
+worstPlant = i;
+}
+}
+int bestSingleDayPlant = 0;
+int bestSingleDayProduction = dataset[0].plants[0];
+struct Date bestSingleDayDate;
+for (int i = 0; i < dataSize; ++i) {
+for (int j = 0; j < 6; ++j) {
+if (dataset[i].plants[j] > bestSingleDayProduction) {
+bestSingleDayProduction = dataset[i].plants[j];
+bestSingleDayPlant = j;
+bestSingleDayDate = dataset[i].date;
+}
+}
+}
+int bestSingleDayTotalProduction = 0;
+struct Date bestSingleDayTotalProductionDate;
+for (int i = 0; i < dataSize; ++i) {
+int totalProductionForDay = 0;
+for (int j = 0; j < 6; ++j) {
+totalProductionForDay += dataset[i].plants[j];
+}
+if (totalProductionForDay > bestSingleDayTotalProduction) {
+bestSingleDayTotalProduction = totalProductionForDay;
+bestSingleDayTotalProductionDate = dataset[i].date;
+}
+}
+printf("Production Report:\n");
+printf("Best Performing Plant Overall: Plant L%d\n", bestPlant + 1);
+printf("Worst Overall Performing Plant: Plant L%d\n", worstPlant + 1);
+printf("Best Single Day Production for a Single Plant: Plant L%d, Production: %d, Date: %d-%02d-%02d\n",
+bestSingleDayPlant + 1, bestSingleDayProduction,
+bestSingleDayDate.year, bestSingleDayDate.month, bestSingleDayDate.day);
+printf("Best Single Production Day for All Facilities: Production: %d, Date: %d-%02d-%02d\n",
+bestSingleDayTotalProduction,
+bestSingleDayTotalProductionDate.year, bestSingleDayTotalProductionDate.month, bestSingleDayTotalProductionDate.day);
+}
+void searchProductionData() {
+int year, month, day;
+char buffer[256];
+int choice;
+while (1) {
+printf("Enter date (YYYY MM DD): ");
+if (scanf("%d %d %d", &year, &month, &day) != 3 || getchar() != '\n') {
+// Invalid input, clear the input buffer and display an error message
+fgets(buffer, sizeof(buffer), stdin); // Clear the input buffer
+printf("Invalid input. Please enter a valid date.\n");
+} else if (year < 0 || month < 1 || month > 12 || day < 1 || day > 31) {
+// Invalid date, display an error message
+printf("Invalid date. Please enter a valid date.\n");
+} else {
+break; // Valid input, exit the loop
+}
+}
+printf("Select an option:\n");
+printf("1. Search for single plant production data\n");
+printf("2. Search for all plants production data\n");
+printf("Enter your choice: ");
+scanf("%d", &choice);
+switch (choice) {
+case 1: {
+int plantIndex;
+printf("Enter the plant index (1-6): ");
+scanf("%d", &plantIndex);
+if (plantIndex >= 1 && plantIndex <= 6) {
+searchSinglePlantProduction(year, month, day, plantIndex - 1);
+} else {
+printf("Invalid plant index.\n");
+}
+break;
+}
+case 2:
+searchAllPlantsProduction(year, month, day);
+break;
+default:
+printf("Invalid choice.\n");
+}
+}
+void showMenu() {
+printf("\nMenu:\n");
+printf("1. Plant Data Analysis\n");
+printf("2. Production Report\n");
+printf("3. Search Production Data\n");
+printf("4. Exit\n");
+}
+int main() {
+int choice;
+while (1) {
+readCSVFile();
+do {
+showMenu();
+printf("Enter your choice: ");
+scanf("%d", &choice);
+switch (choice) {
+case 1:
+generateDetailedReport();
+break;
+case 2:
+generateProductionReport();
+break;
+case 3:
+searchProductionData();
+break;
+case 4:
+printf("Exiting the program.\n");
+break;
+default:
+printf("Invalid choice. Please try again.\n");
+}
+} while (choice != 4);
+char response;
+printf("Do you want to input another file? (y/n): ");
+scanf(" %c", &response);
+if (response != 'y' && response != 'Y') {
+break;
+}
+}
+return 0;
+}
