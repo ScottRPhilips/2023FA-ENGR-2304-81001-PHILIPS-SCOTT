@@ -1,0 +1,101 @@
+﻿#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal.h>
+
+
+int leds[] = {13, 12, 8, 4, 7};
+int count = 0;
+const int MAX_PSI = 120;
+
+
+LiquidCrystal_I2C lcd(0x20, 20, 4);
+
+
+int targetPressure;
+int currentPressure;
+
+
+bool lightTriggered = false; // Variable to track whether the light on pin 7 has been triggered
+int countdownValue = 10; // Set the initial countdown value
+
+
+void setup() {
+  for (int i = 0; i < 5; i++) {
+    pinMode(leds[i], OUTPUT);
+  }
+  pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
+
+
+  lcd.init();
+  lcd.print("Target: Current:");
+
+
+  Serial.begin(115200);
+}
+
+
+void loop() {
+  int targetPotValue = analogRead(A0);
+  targetPressure = map(targetPotValue, 0, 1023, 0, MAX_PSI);
+
+
+  int currentPotValue = analogRead(A1);
+  currentPressure = map(currentPotValue, 0, 1023, 0, MAX_PSI);
+
+
+  Serial.print("Target PSI: ");
+  Serial.print(targetPressure);
+  Serial.print("\tCurrent PSI: ");
+  Serial.println(currentPressure);
+
+
+  lcd.setCursor(0, 1);
+  lcd.print(targetPressure);
+  lcd.print("    ");
+  lcd.setCursor(9, 1);
+  lcd.print(currentPressure);
+  lcd.print("    ");
+
+
+  if (targetPressure <= currentPressure) {
+    digitalWrite(leds[4], HIGH);
+    lightTriggered = true; // Light on pin 7 has been triggered
+  } else {
+    digitalWrite(leds[4], LOW);
+    lightTriggered = false; // Reset the trigger state
+  }
+
+
+  // Countdown starts after the light on pin 7 is triggered
+  if (lightTriggered) {
+    lcd.setCursor(0, 2);
+    lcd.print("Countdown: ");
+    lcd.print(countdownValue);
+    
+    for (int i = 0; i < 4; i++) {
+      digitalWrite(leds[i], bitRead(count, i));
+    }
+
+
+    count++;
+    if (count == 32) {
+      count = 0;
+      countdownValue--;
+
+
+      // Reset the countdown after reaching 0
+      if (countdownValue == 0) {
+        lightTriggered = false;
+        countdownValue = 10; // Reset the countdown value
+
+
+        lcd.setCursor(0, 2);
+        lcd.print("               "); // Clear the countdown line
+      }
+    }
+
+
+    delay(500);
+  }
+}
